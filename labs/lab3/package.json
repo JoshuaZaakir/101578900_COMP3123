@@ -1,0 +1,20 @@
+{
+    "name": "Week03_Lab",
+    "version": "1.0.0",
+    "description": "Sample Node.js server and running it",
+    "main": "main.js",
+    "scripts": {
+        "start": "nodemon ./main.js localhost 8088"
+    },
+    "keywords": [
+        "node.js",
+        "web server",
+        "http",
+        "writing to a server"
+    ],
+    "author": "Joshua Zaakir",
+    "license": "ISC",
+    "dependencies": {
+        "nodemon": "^2.0.12"
+    }
+}
