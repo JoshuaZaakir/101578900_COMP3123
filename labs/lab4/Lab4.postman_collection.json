@@ -1,0 +1,29 @@
+{
+  "info": {
+    "name": "Joshua Zaakir - COMP3123 Lab 4",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    { "name": "01 GET hello", "request": { "method": "GET", "url": "http://localhost:8080/hello" } },
+    { "name": "02 GET user defaults", "request": { "method": "GET", "url": "http://localhost:8080/user" } },
+    { "name": "03 GET user query", "request": { "method": "GET", "url": "http://localhost:8080/user?firstname=Joshua&lastname=Zaakir" } },
+    { "name": "04 POST user path", "request": { "method": "POST", "url": "http://localhost:8080/user/John/Doe" } },
+    {
+      "name": "05 POST users array",
+      "request": {
+        "method": "POST", "url": "http://localhost:8080/users",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "[\n  {\"firstname\":\"Pritesh\",\"lastname\":\"Patel\"},\n  {\"firstname\":\"John\",\"lastname\":\"Doe\"},\n  {\"firstname\":\"John\",\"lastname\":\"Rome\"}\n]", "options": { "raw": { "language": "json" } } }
+      }
+    },
+    {
+      "name": "06 POST users error",
+      "request": {
+        "method": "POST", "url": "http://localhost:8080/users",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{}", "options": { "raw": { "language": "json" } } }
+      }
+    },
+    { "name": "07 GET static instructions", "request": { "method": "GET", "url": "http://localhost:8080/instruction.html" } }
+  ]
+}
