@@ -1,0 +1,18 @@
+body {
+    font-family: system-ui, sans-serif;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 36px 16px;
+    text-align: center;
+}
+
+.react-logo {
+    width: min(300px, 65vw);
+    height: auto;
+    margin-bottom: 28px;
+}
+
+.student-name,
+.college {
+    font-weight: bold;
+}
