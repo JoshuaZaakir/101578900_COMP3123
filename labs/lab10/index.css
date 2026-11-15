@@ -1,0 +1,90 @@
+body {
+    font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+    margin: 16px;
+    color: #212529;
+}
+
+.data-entry {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+form {
+    border: 3px solid green;
+    padding: 12px;
+    text-align: center;
+}
+
+h1 {
+    margin: 0 0 12px;
+    font-size: clamp(2rem, 5vw, 2.5rem);
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.form-row > * {
+    flex: 1;
+    min-width: 0;
+}
+
+label {
+    display: block;
+}
+
+form > label,
+.form-row > * {
+    margin-bottom: 16px;
+}
+
+input:not([type="checkbox"]),
+select {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 12px;
+    border: 1px solid #adb5bd;
+    border-radius: 4px;
+    color: inherit;
+    background: white;
+    font: inherit;
+}
+
+.terms {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+button {
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 4px;
+    background: #218838;
+    color: white;
+    font: inherit;
+    cursor: pointer;
+}
+
+.submitted-data {
+    margin: 16px 0 0;
+}
+
+.submitted-data dt {
+    font-weight: bold;
+}
+
+.submitted-data dd {
+    margin: 0 0 8px;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 550px) {
+    .form-row {
+        display: block;
+    }
+}
