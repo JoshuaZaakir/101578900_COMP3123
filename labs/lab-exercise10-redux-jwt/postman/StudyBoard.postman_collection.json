@@ -1,0 +1,372 @@
+{
+  "info": {
+    "name": "StudyBoard — Lab Exercise 10",
+    "description": "Local runnable API contract: valid login, invalid credentials, protected resources and JWT tampering. Demo credentials are intentionally public. No remote workspace is required.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:3010/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "tampered",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Profile requires authentication",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/me",
+        "description": "Profile requires authentication. Expected HTTP 401. See README.md for the API contract."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => { pm.response.to.have.status(401); });",
+              "pm.test(\"Useful missing-token error\", () => { pm.expect(pm.response.json().message).to.include(\"Bearer\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks require authentication",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/tasks",
+        "description": "Tasks require authentication. Expected HTTP 401. See README.md for the API contract."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reject malformed login input",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "description": "Reject malformed login input. Expected HTTP 400. See README.md for the API contract.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"demo@studyboard.dev\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reject wrong password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "description": "Reject wrong password. Expected HTTP 401. See README.md for the API contract.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"demo@studyboard.dev\",\"password\":\"wrong\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Issue signed JWT",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "description": "Issue signed JWT. Expected HTTP 200. See README.md for the API contract.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"demo@studyboard.dev\",\"password\":\"ReduxJWT10!\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => { pm.response.to.have.status(200); });",
+              "pm.test(\"Three token parts\", () => { pm.expect(pm.response.json().token.split(\".\")).to.have.lengthOf(3); });",
+              "pm.test(\"Fifteen minute lifetime\", () => { pm.expect(pm.response.json().expiresIn).to.equal(900); });",
+              "pm.test(\"No password in returned user\", () => { pm.expect(pm.response.json().user).not.to.have.property(\"password\"); });",
+              "pm.collectionVariables.set(\"token\", pm.response.json().token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Read protected profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/me",
+        "description": "Read protected profile. Expected HTTP 200. See README.md for the API contract."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => { pm.response.to.have.status(200); });",
+              "pm.test(\"Correct user\", () => { pm.expect(pm.response.json().user.email).to.equal(\"demo@studyboard.dev\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Read protected tasks",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/tasks",
+        "description": "Read protected tasks. Expected HTTP 200. See README.md for the API contract."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => { pm.response.to.have.status(200); });",
+              "pm.test(\"Three seed tasks\", () => { pm.expect(pm.response.json().tasks).to.have.lengthOf(3); });",
+              "pm.test(\"Task shape\", () => { pm.response.json().tasks.forEach(task => { pm.expect(task).to.have.all.keys(\"id\", \"title\", \"completed\"); }); });",
+              "pm.test(\"No caching\", () => { pm.expect(pm.response.headers.get(\"Cache-Control\")).to.equal(\"no-store\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reject tampered JWT",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tampered}}"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/me",
+        "description": "Reject tampered JWT. Expected HTTP 401. See README.md for the API contract."
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const parts = pm.collectionVariables.get(\"token\").split(\".\");",
+              "parts[1] = \"eyJzdWIiOiJpbnRydWRlciJ9\"; // {\"sub\":\"intruder\"}, with original signature",
+              "pm.collectionVariables.set(\"tampered\", parts.join(\".\"));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => { pm.response.to.have.status(401); });",
+              "pm.test(\"Signature verification error\", () => { pm.expect(pm.response.json().message).to.include(\"verification failed\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reject malformed JWT",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer not.a.jwt"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/me",
+        "description": "Reject malformed JWT. Expected HTTP 401. See README.md for the API contract."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Issue short-lived token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "description": "Issue short-lived token. Expected HTTP 200. See README.md for the API contract.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"demo@studyboard.dev\",\"password\":\"ReduxJWT10!\",\"shortLived\":true}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => { pm.response.to.have.status(200); });",
+              "pm.test(\"Ten second lifetime\", () => { pm.expect(pm.response.json().expiresIn).to.equal(10); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Unknown API route",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/unknown",
+        "description": "Unknown API route. Expected HTTP 404. See README.md for the API contract."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

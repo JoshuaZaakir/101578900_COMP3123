@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+evidence/
+*.log
+playwright-report/
+test-results/

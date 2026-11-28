@@ -1,0 +1,38 @@
+{
+  "name": "lab-exercise10-redux-jwt",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "COMP3123 Lab Exercise 10 — React Redux and JWT study board",
+  "author": "Joshua Zaakir (101578900)",
+  "scripts": {
+    "dev": "concurrently -k -n API,WEB \"node --watch server/index.js\" \"vite --host 127.0.0.1\"",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "test": "node --test tests/*.test.js",
+    "test:api": "postman collection run postman/StudyBoard.postman_collection.json --no-report-events",
+    "test:e2e": "node scripts/verify-demo.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JoshuaZaakir/101578900_COMP3123.git",
+    "directory": "labs/lab-exercise10-redux-jwt"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.15.0",
+    "express": "^5.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-redux": "^9.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.3.0",
+    "concurrently": "^10.0.7",
+    "playwright": "^1.65.1",
+    "vite": "^8.4.0"
+  }
+}
